@@ -1,12 +1,15 @@
 export const en = {
   label: {
+    gearnovo: 'Gear New',
     fogo: 'Fire',
     agua: 'Water',
     terra: 'Earth',
     ar: 'Air',
+    ou: 'Or',
     nome: 'Name',
     bonus: 'Effects',
     nivel: 'Level',
+    nv: 'Lv.',
     mostrar: 'Show',
     obrigatorio: 'Required',
     raridade: 'Rarity',
@@ -24,6 +27,9 @@ export const en = {
     wgcode: 'Wakfu Gear Code',
     mostrando: 'Showing {0} of',
     qntitens: '{0} items',
+    qntgears: '{0} gears',
+    comparandogears: 'Comparing Gears',
+    importeouadd: '(Import or Create New)',
     totalitens: 'Total of {0} items',
     tipo: 'Type',
     selecionartudo: 'Select All',
@@ -36,6 +42,7 @@ export const en = {
     trocargear: 'Switch Gear',
     adicionaraogear: 'Add to Gear',
     abrirsiteoficial: 'Open in the official website',
+    abrirgear: 'View Gear',
     gravartitulo: 'Save Title',
     editartitulo: 'Edit Title',
     trocaridioma: 'Change Language',
@@ -46,11 +53,73 @@ export const en = {
     secundarios: 'Secondary',
     versao: 'Version: {0}',
     fork: 'Fork the project on {0}.',
+    nivelmaximo: 'Maximum Level',
+    nivelminimo: 'Minimum Level',
     maximo: 'Maximum',
-    minimo: 'Minimum'
+    minimo: 'Minimum',
+    calculadora: 'Damage',
+    Frente: 'Front',
+    Costas: 'Back',
+    ST: 'ST',
+    ZONA: 'Area',
+    CAC: 'Melee',
+    DIST: 'Dist',
+    Normal: 'Normal',
+    Critico: 'Critical',
+    Berserk: 'Berserk',
+    BskCrit: 'BskCrit',
+    limpartudo: 'Clean all',
+    temaescuro: 'Dark Theme',
+    geral: 'General',
+    basedano: 'Base Damage',
+    basecritico: 'Base Critical Damage',
+    resistencia: 'Resistance',
+    resistenciap: 'Resistance in %',
+    comparandodanogears: 'Comparing the Damage',
+    calculadoradano: 'Understand the Calculation',
+    calculodano: 'Damage Calculation',
+    tabelatransposta: 'Table Transposed [Disabled]',
+    configs: 'Settings',
+    moreinfos: 'More Information',
+    posicaoconjurador: 'Caster Position',
+    alvofeitico: 'Target of the Spell',
+    distanciaalvo: 'Target Distance',
+    multiplicadores: 'Multipliers',
+    critico: 'Critical',
+    berserk: 'Berserk',
+    distancia: 'Distance',
+    cac: 'Melee',
+    alvounico: 'Single Target',
+    salvar: 'Save',
+    zona: 'Zone',
+    frente: 'Front',
+    costas: 'Back',
+    url: 'URL',
+    tabelaretrair: 'Retract Attributes',
+    danoinfligido: 'Damage Inflicted'
   },
   msg: {
-    adicionarEquip: 'Add equipment to this gear'
+    adicionarEquip: 'Add equipment to this gear',
+    atualizaritens: 'Download the latest version of the equipment.',
+    temaescuro: 'Toggles between the white theme and the dark theme.',
+    tabelatransposta: 'Switch between row or column table views.',
+    copy: 'Copied to the clipboard!',
+    tabelaretrair: 'Scrolling the horizontal bar retracts the attributes and displays only the icons.'
+  },
+  info: {
+    itens: 'Items',
+    altonivel: 'High Level (200+)',
+    reliquias: 'Relics',
+    epicos: 'Epics',
+    lembrancas: 'Souvenirs',
+    mascotes: 'Pets',
+    montarias: 'Mounts',
+    sematributos: 'No Attributes',
+    comefeitos: 'With Effects',
+    armas: 'Weapons',
+    segundamao: 'Second Hand',
+    escudos: 'Shields',
+    url: 'URL'
   },
   tipo: {
     amuleto: 'Amulet',
@@ -79,6 +148,11 @@ export const en = {
     'Epic'
   ],
   dialog: {
+    editarNome: {
+      titulo: 'Edit Title',
+      msg: 'Choose the new title of the gear "{nome}".',
+      label: 'New Title'
+    },
     atualizar: {
       titulo: 'Update Items',
       msg: 'A new version of the items has been found. Do you want to update?'
@@ -87,23 +161,31 @@ export const en = {
       titulo: 'Confirm',
       msg: 'Are you sure you want to delete this gear?'
     },
+    ls: {
+      titulo: 'Confirm',
+      msg: 'Are you sure you want to delete all data saved locally?'
+    },
     clonar: {
       titulo: 'Confirm',
       msg: 'Do you want clone this gear?'
     },
-    confirmar: 'Yes',
+    sim: 'Yes',
+    confirmar: 'Confirm',
     cancelar: 'Cancel'
   },
   alert: {
     one_relic: 'Only 1 relic per gear.',
     one_epic: 'Only 1 epic per gear.',
-    one_unique: 'Only 1 unique ring per gear.'
+    one_unique: 'Only 1 unique ring per gear.',
+    add_equips: 'Add equipment to this gear.'
   },
   localstorage: {
     dados: 'Data',
     nomes: 'Names',
     filtros: 'Filters',
-    gears: 'Gears'
+    gears: 'Gears',
+    configs: 'Settings',
+    disponivel: 'Free'
   },
   loading: [
     'Loading',

@@ -28,6 +28,7 @@ const state = {
 }
 
 const getters = {
+  allGears: state => state.gears,
   gears: state => state.gears.map(gear => gear.nome),
   gearAtual: state => state.gears[state.gearAtual].gear,
   indexAtual: state => state.gearAtual,
@@ -53,8 +54,10 @@ const actions = {
     let LS = localStorage.getItem('gears')
     if (LS) {
       LS = JSON.parse(LS)
+      LS.gears.forEach(gear => { gear.qntItens = Object.keys(gear.gear).reduce((total, atual) => !gear.gear[atual] ? total : total + 1, 0) })
+      const index = !LS.gearAtual || LS.gearAtual > LS.gears.length ? 0 : LS.gearAtual
       commit('init', { LS })
-      commit('setAtual', { index: LS.gearAtual })
+      commit('setAtual', { index })
     } else {
       commit('addGear', {})
       commit('setAtual', { index: 0 })
@@ -63,14 +66,20 @@ const actions = {
   },
   selecionarAtual ({ commit, state, dispatch }, { index }) {
     commit('setAtual', { index })
+    commit('salvarLS')
   },
   setNome ({ commit }, { nome, index }) {
     index = (index != null ? index : state.gearAtual)
-    commit('setNome', { nome, index })
+    let nomeAjustado = nome.length > 30 ? `${nome.substring(0, 27)}...` : nome
+    nomeAjustado = nomeAjustado.length < 1 ? 'Gear' : nomeAjustado
+    commit('setNome', { nome: nomeAjustado, index })
     commit('salvarLS')
   },
   async adicionarGear ({ commit }, { gear }) {
-    if (gear) gear = JSON.parse(JSON.stringify(gear))
+    if (gear) {
+      gear = JSON.parse(JSON.stringify(gear))
+      gear.qntItens = Object.keys(gear.gear).reduce((total, atual) => !gear.gear[atual] ? total : total + 1, 0)
+    }
     commit('addGear', { gear })
     commit('salvarLS')
   },
@@ -82,11 +91,8 @@ const actions = {
   async removerGear ({ commit }, { index }) {
     index = (index != null ? index : state.gearAtual)
     commit('removerGear', { index })
-    if (index === state.gearAtual) commit('setAtual', { index: 0 })
-    if (state.gears.length === 0) {
-      commit('addGear', {})
-      commit('setAtual', { index: 0 })
-    }
+    if (state.gears.length === 0) commit('addGear', {})
+    commit('setAtual', { index: 0 })
     commit('salvarLS')
   },
   async editarGear ({ commit }, { gear, index }) {

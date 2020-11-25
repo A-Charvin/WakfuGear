@@ -1,5 +1,5 @@
 <template>
-  <v-content :class="`white ${retrair ? 'retraido' : null}`">
+  <v-content :class="`${retrair ? 'retraido' : ''}`">
     <v-container
       fluid
       fill-height
@@ -67,9 +67,17 @@
                     :class="ordenarPor === atributo ? (!!ordemAsc ? 'ordemAscSelecionada' : 'ordemSelecionada') : null"
                     @click="ordenar(atributo)"
                   >
-                    <td :class="`icone i${atributo}`">
+                    <v-tooltip bottom>
+                      <template #activator="{ on }">
+                        <td
+                          :class="`icone i${atributo}`"
+                          v-on="on"
+                        >
+                          <span>{{ traduzir(equipEffects, atributo) }}</span>
+                        </td>
+                      </template>
                       <span>{{ traduzir(equipEffects, atributo) }}</span>
-                    </td>
+                    </v-tooltip>
                   </tr>
                 </template>
               </draggable>
@@ -115,7 +123,7 @@ import { equipType } from '../../model/equipType'
 import { equipEffects } from '../../model/equipEffects'
 
 export default {
-  name: 'DataTable',
+  name: 'DataTableEquips',
   components: {
     draggable,
     DataValue,
@@ -138,6 +146,7 @@ export default {
     equipType
   }),
   computed: {
+    ...mapGetters('configs', { retrairSetting: 'retrair' }),
     ...mapGetters('items', ['items', 'itemsList']),
     ...mapGetters('filtros', ['filtros'])
   },
@@ -190,11 +199,13 @@ export default {
       EventBus.$emit('terminouFiltragem')
     },
     async filtrarDados (items, filtro) {
-      items = filtros.filtroNome(items, filtro)
-      items = filtros.filtroLevel(items, filtro)
-      items = filtros.filtroRaridade(items, filtro)
-      items = filtros.filtroTipo(items, filtro)
-      items = filtros.filtroBonus(items, filtro)
+      if (filtros.existeFiltroNome(filtro)) items = filtros.filtroNome(items, filtro)
+      else {
+        items = filtros.filtroLevel(items, filtro)
+        items = filtros.filtroRaridade(items, filtro)
+        items = filtros.filtroTipo(items, filtro)
+        items = filtros.filtroBonus(items, filtro)
+      }
 
       return items
     },
@@ -218,27 +229,14 @@ export default {
       this.$refs.atributos.scrollTop = evt.target.scrollTop
       this.$refs.items.scrollLeft = evt.target.scrollLeft
 
-      if (evt.target.scrollLeft < 20) this.retrair = false
-      else this.retrair = true
+      if (this.retrairSetting) {
+        if (evt.target.scrollLeft < 20 && this.$vuetify.breakpoint.lgAndUp) this.retrair = false
+        else this.retrair = true
+      }
     }
   }
 }
 </script>
 
 <style>
-  #dados tr:hover {
-    background: #fff4f2;
-  }
-  .ordemSelecionada {
-    background: #fafafa;
-  }
-  .ordemSelecionada > td:after {
-    content: '▼';
-  }
-  .ordemAscSelecionada > td:after {
-    content: '▲';
-  }
-  .atributoSelecionado {
-    background: #fafafa;
-  }
 </style>

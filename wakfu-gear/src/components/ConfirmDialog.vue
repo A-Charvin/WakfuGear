@@ -69,7 +69,7 @@ export default {
   }),
   mounted () {
     this.label.cancelar = this.labelCancelar ? this.labelCancelar : this.$i18n.t('dialog.cancelar')
-    this.label.confirmar = this.labelConfirmar ? this.labelConfirmar : this.$i18n.t('dialog.confirmar')
+    this.label.confirmar = this.labelConfirmar ? this.labelConfirmar : this.$i18n.t('dialog.sim')
   },
   methods: {
     abrir (obj) {

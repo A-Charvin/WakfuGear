@@ -2,7 +2,7 @@
   <v-dialog
     v-model="dialog"
     max-width="800px"
-    persistent
+    transition="dialog-bottom-transition"
     @keydown.esc="cancelar"
   >
     <v-card>
@@ -45,6 +45,7 @@
           lg9
         >
           <v-text-field
+            ref="campo"
             v-model="linkZenith"
             :disabled="loading"
             label="Zenith Wakfu Builder"
@@ -54,7 +55,7 @@
           >
             <template #prepend>
               <img
-                src="https://zenithwakfu.com/images/menu/logo.png"
+                src="static/zenith.png"
                 height="25"
               >
             </template>
@@ -77,18 +78,22 @@
         </v-flex>
       </v-layout>
       <v-divider />
+      <div class="ou">
+        <span>
+          {{ $t('label.ou') }}
+        </span>
+      </div>
       <v-layout
         py-2
         px-4
         wrap
       >
         <v-flex xs12>
-          <v-textarea
+          <v-text-field
             v-model="codigo"
             :disabled="loading"
             :label="$t('label.wgcode')"
             placeholder="19699-19879-20218-20213-19859-25076-19710-20169-14147-20365-19884-26865"
-            dense
           />
         </v-flex>
         <v-flex v-if="alertCodigo">
@@ -136,6 +141,10 @@ export default {
   methods: {
     abrir () {
       this.dialog = true
+      this.linkZenith = ''
+      this.codigo = ''
+      this.linkMethod = ''
+      this.focarCampo()
     },
     cancelar () {
       this.dialog = false
@@ -146,19 +155,8 @@ export default {
         msg
       }
     },
-    async criarGear (arrayItems) {
-      const items = []
-      this.items.forEach(item => {
-        if (arrayItems.some(codigo => codigo === item.id)) {
-          items.push(item)
-        }
-      })
-      const index = this.qnt
-      this.$store.dispatch('gears/adicionarGear', {})
-      this.$store.dispatch('gears/selecionarAtual', { index })
-      this.$store.dispatch('gears/adicionarItems', { items })
-    },
     async importarZenith () {
+      this.linkZenith = this.linkZenith.replace('www.', '')
       if (!this.linkZenith.includes('https://zenithwakfu.com/builder/')) return this.erro('Link errado!')
       this.loading = true
       const getID = encodeURIComponent(this.linkZenith.replace('https://zenithwakfu.com/builder/', ''))
@@ -184,6 +182,10 @@ export default {
 
       this.loading = false
       this.dialog = false
+    },
+    async focarCampo () {
+      await this.$nextTick()
+      this.$refs.campo.focus()
     }
   }
 }

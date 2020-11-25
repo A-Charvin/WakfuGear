@@ -4,6 +4,7 @@
     bottom
     left
     offset-x
+    content-class="pointerevent"
   >
     <template #activator="{ on }">
       <slot
@@ -27,15 +28,18 @@
             <v-divider />
             <v-list-tile class="menulist">
               <v-list-tile-action>
-                <img
+                <v-img
                   :src="`${url}${item.item.iid[0]}.png`"
                   height="30"
-                >
+                  width="30"
+                  lazy-src="/static/erro2.png"
+                  contain
+                />
               </v-list-tile-action>
               <v-list-tile-content class="fontsmall">
                 <v-list-tile-title>{{ item.item.title[$lang] }}</v-list-tile-title>
               </v-list-tile-content>
-              <v-list-tile-avatar class="fontsmall">
+              <v-list-tile-avatar class="fontsmall text-xs-right">
                 {{ item.valor }}
               </v-list-tile-avatar>
             </v-list-tile>

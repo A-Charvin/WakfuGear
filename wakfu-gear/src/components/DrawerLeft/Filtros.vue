@@ -25,14 +25,14 @@
                 dark
                 class="ma-0"
                 v-on="on"
-                @click="atualizarItens"
+                @click="abrirConfigs"
               >
                 <v-icon size="16">
-                  backup
+                  settings
                 </v-icon>
               </v-btn>
             </template>
-            <span>{{ $t('label.atualizaritens') }}</span>
+            <span>{{ $t('label.configs') }}</span>
           </v-tooltip>
         </div>
         <img
@@ -51,7 +51,7 @@
 
     <v-flex
       fill-height
-      class="scroll"
+      class="scroll corFundoBranco"
       pt-1
     >
       <v-flex
@@ -65,27 +65,89 @@
           :items="itemsList"
           clearable
           dense
+          @change="emitirFiltros"
         />
       </v-flex>
 
       <v-flex px-3>
-        <drop-box
+        <label class="minilabel">{{ $t('label.tipo') }}</label>
+        <v-btn-toggle
           v-model="filtros.tipos"
-          :items="itemsTipo"
-          :label="$t('label.tipo')"
-          :placeholder="$t('label.tipo')"
-          selecionar-todos-icone="tipo/118.png"
-        />
+          multiple
+          class="transparent preencher wrap mb-3 mt-1"
+        >
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                flat
+                :input-value="null"
+                v-on="on"
+                @click="toggleTodosTipos"
+              >
+                <img src="../../../static/tipo/-1.png">
+              </v-btn>
+            </template>
+            <span>{{ $t('label.selecionartudo') }}</span>
+          </v-tooltip>
+
+          <template v-for="tipo in itemsTipo">
+            <v-tooltip
+              :key="`tipo${tipo.id}`"
+              bottom
+            >
+              <template #activator="{ on }">
+                <v-btn
+                  flat
+                  :value="tipo.id"
+                  v-on="on"
+                >
+                  <img :src="`../../../static/${tipo.img}`">
+                </v-btn>
+              </template>
+              <span>{{ tipo[$lang] }}</span>
+            </v-tooltip>
+          </template>
+        </v-btn-toggle>
       </v-flex>
 
       <v-flex px-3>
-        <drop-box
+        <label class="minilabel">{{ $t('label.raridade') }}</label>
+        <v-btn-toggle
           v-model="filtros.raridades"
-          :items="itemsRaridade"
-          :label="$t('label.raridade')"
-          :placeholder="$t('label.raridade')"
-          selecionar-todos-icone="raridade/r0.png"
-        />
+          multiple
+          class="transparent preencher mb-3 mt-1"
+        >
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                flat
+                :input-value="null"
+                v-on="on"
+                @click="toggleTodasRaridades"
+              >
+                <img src="../../../static/raridade/r0.png">
+              </v-btn>
+            </template>
+            <span>{{ $t('label.selecionartudo') }}</span>
+          </v-tooltip>
+
+          <template v-for="rarity in itemsRaridade">
+            <v-tooltip
+              :key="`rarity${rarity.id}`"
+              bottom
+            >
+              <template #activator="{ on }">
+                <v-btn
+                  flat
+                  v-on="on"
+                >
+                  <img :src="`../../../static/${rarity.img}`">
+                </v-btn>
+              </template>
+              <span>{{ rarity[$lang] }}</span>
+            </v-tooltip>
+          </template>
+        </v-btn-toggle>
       </v-flex>
 
       <v-flex px-3>
@@ -98,22 +160,21 @@
       </v-flex>
 
       <v-flex
-        px-3
+        px-2
         mb-5
       >
-        <label style="font-size: 13px; color: rgba(0,0,0,.54);">{{ $t('label.nivel') }}</label>
         <v-layout>
           <v-flex px-2>
             <v-text-field
               v-model="filtros.niveis[0]"
-              :label="$t('label.minimo')"
+              :label="$t('label.nivelminimo')"
               type="number"
             />
           </v-flex>
           <v-flex px-2>
             <v-text-field
               v-model="filtros.niveis[1]"
-              :label="$t('label.maximo')"
+              :label="$t('label.nivelmaximo')"
               type="number"
             />
           </v-flex>
@@ -121,7 +182,7 @@
         <v-range-slider
           v-model="filtros.niveis"
           ticks
-          class="px-2 mt-0"
+          class="px-3 mt-0"
           thumb-label="always"
           color="deep-orange accent-4"
           :step="1"
@@ -141,13 +202,11 @@
           <v-icon>arrow_right</v-icon>
         </v-btn>
       </v-flex>
-
-      <localStorage v-if="ehDev" />
     </v-flex>
 
     <v-flex>
       <v-footer class="px-3 foot">
-        <small>Bruno Cunha &copy; 2019.
+        <small>Bruno Cunha &copy; {{ (new Date()).getFullYear() }}.
           <i18n
             path="label.fork"
             tag="label"
@@ -172,12 +231,10 @@ import EventBus from '../../event-bus'
 import { equipType } from '../../model/equipType'
 import { equipEffects } from '../../model/equipEffects'
 import { rarity } from '../../model/rarity'
-import LocalStorage from './LocalStorage'
-// import { states } from '../model/states'
 
 export default {
   name: 'Filtros',
-  components: { LocalStorage, DropBox, Idioma },
+  components: { DropBox, Idioma },
   data: () => ({
     filtros: {
       nome: '',
@@ -187,8 +244,8 @@ export default {
       bonus: [],
       lang: ''
     },
-    itemsRaridade: rarity,
-    itemsTipo: equipType,
+    itemsRaridade: [],
+    itemsTipo: [],
     itemsBonus: [],
     progress: false
   }),
@@ -202,10 +259,17 @@ export default {
       return !process.env.build
     }
   },
+  watch: {
+    'filtros.raridades' (val) {
+      const index = this.filtros.raridades.indexOf(0)
+      if (val.length <= 7 && index !== -1) this.filtros.raridades.splice(index, 1)
+      else if (val.length === 7 && index === -1) this.filtros.raridades.unshift(0)
+    }
+  },
   async mounted () {
     this.itemsBonus = this.traduzirFx(equipEffects)
-    this.itemsRaridade = rarity.sort((a, b) => a[this.$lang].localeCompare(b[this.$lang]))
-    this.itemsTipo = equipType.sort((a, b) => a[this.$lang].localeCompare(b[this.$lang]))
+    this.itemsRaridade = rarity.sort((a, b) => a.id - b.id)
+    this.itemsTipo = equipType.filter(e => e.iid !== 518 && e.iid !== 519).sort((a, b) => a.id - b.id)
     this.filtros = {
       ...this.filtros,
       ...JSON.parse(JSON.stringify(this.filtrosLS)),
@@ -219,47 +283,47 @@ export default {
   },
   methods: {
     traduzirFx (val) {
-      return val
+      return val.sort((a, b) => {
+        const at = a[this.$lang]
+        const bt = b[this.$lang]
+        if (at > bt) return 1
+        else if (at < bt) return -1
+        return 0
+      })
     },
     async emitirFiltros () {
       this.progress = true
+      EventBus.$emit('trocarTab')
       EventBus.$emit('filtrar', this.filtros)
       this.$store.dispatch('filtros/salvar', this.filtros)
     },
     terminouFiltragem () {
       this.progress = false
+    },
+    abrirConfigs () {
+      this.$ConfigDialog.abrir()
+    },
+    async toggleTodosTipos () {
+      await this.$nextTick()
+      if (this.filtros.tipos.length < this.itemsTipo.length) {
+        this.filtros.tipos = this.itemsTipo.map(e => e.id)
+        this.filtros.tipos.unshift(0)
+      } else {
+        this.filtros.tipos = []
+      }
+    },
+    async toggleTodasRaridades () {
+      await this.$nextTick()
+      if (this.filtros.raridades.length < this.itemsRaridade.length) {
+        this.filtros.raridades = this.itemsRaridade.map(e => e.id)
+        this.filtros.raridades.unshift(0)
+      } else {
+        this.filtros.raridades = []
+      }
     }
   }
 }
 </script>
 
 <style>
-  #logo img {
-    padding: 7px 0;
-    filter: drop-shadow(1px 1px 0 #333) drop-shadow(-1px -1px 0 #333) drop-shadow(0px 0px 10px #333);
-  }
-  .versao {
-    position: absolute;
-    color: rgba(255, 255, 255, .9);
-    font-size: 11px;
-    padding: 5px;
-    left: 0;
-    top: 0;
-  }
-  .atualizar, .lang {
-    position: absolute;
-    padding: 0 5px;
-    right: 0;
-    bottom: 0;
-    z-index: 9;
-  }
-  .lang {
-    top: 0;
-  }
-  .v-slider__thumb-label__container { bottom: -70px; top: auto; }
-  .v-slider__thumb-label { border-radius: 0 50% 50% 50%; }
-  .v-chip--select-multi { margin: 3px 1px 0 0; }
-  .scroll { overflow-y: auto; }
-  .foot { border-top: 1px solid #C0C0C0; }
-  .foot small{ color: rgba(0, 0, 0, .7); font-size: 12px; }
 </style>
