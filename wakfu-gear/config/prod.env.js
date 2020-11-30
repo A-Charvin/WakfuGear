@@ -1,5 +1,5 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',
-  API_URL: '"https://wakfu-api.netlify.app/.netlify/functions"'
+  API_URL: '"https://almost-api.netlify.app/.netlify/functions"'
 }
